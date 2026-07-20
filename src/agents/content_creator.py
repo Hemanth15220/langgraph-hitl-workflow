@@ -1,95 +1,67 @@
-"""
-Content Creator Node: Synthesizes trend data into engaging social media posts
-"""
-
+"""Content Creator: Generate engaging crypto posts"""
 from groq import Groq
 from typing import Dict, List, Any
 from ..config import GROQ_API_KEY, GROQ_MODEL
 
 def generate_content(trends: Dict[str, Any]) -> List[Dict[str, str]]:
-    """
-    Generate engaging social media posts from film trends using Groq LLM.
-    
-    Args:
-        trends (dict): Trend data from Trend-Spotter node
-        
-    Returns:
-        list: List of generated posts with content and metadata
-    """
+    """Generate creative crypto posts"""
     try:
-        # Initialize Groq client
         client = Groq(api_key=GROQ_API_KEY)
-        
-        # Extract film titles and data
-        films = trends.get("trending_films", [])
-        if not films:
+        cryptos = trends.get("trending_films", [])
+        if not cryptos:
             return []
         
-        # Create a prompt for the LLM
-        film_list = "\n".join([f"- {f['title']} (Rating: {f['rating']}/10)" for f in films[:3]])
+        top_cryptos = cryptos[:5]
+        crypto_list = "\n".join([f"- {c.get('title')} ({c.get('symbol')}): ${c.get('price')} | 24h: {c.get('change_24h')}% | Market Cap: ${c.get('market_cap')}" for c in top_cryptos])
         
-        prompt = f"""You're a casual Redditor who loves movies and wants to start discussions about trending films.
+        prompt = f"""You are a crypto analyst posting on Reddit about market trends and opportunities.
 
-Based on these trending films right now:
-{film_list}
+Current Top Cryptos:
+{crypto_list}
 
-Write 3 casual Reddit post titles/content (like you're sharing with friends on r/FilmTrendBot):
-- Keep it conversational and natural
-- Use Reddit style (e.g., "Just watched...", "Has anyone seen...", "TIL...", etc.)
-- Add emojis naturally (not forced)
-- Make people want to discuss/comment
+Write 3 engaging Reddit discussion posts that:
+1. Compare cryptos with each other (which is outperforming, why)
+2. Analyze trends (bullish/bearish signals, market patterns)
+3. Ask thought-provoking questions about the market
+4. Discuss potential impacts (adoption, regulation, tech updates)
+5. Use crypto slang naturally (hodl, bullish, bearish, moon, etc)
+6. Add relevant emojis but not excessive
+7. Sound like real community discussion, not promotional
 
-Format your response as:
-Post 1: [casual title/content]
-Post 2: [casual title/content]
-Post 3: [casual title/content]
-"""
-        
-        # Call Groq API using chat.completions
-        chat_completion = client.chat.completions.create(
+Format:
+Post 1: [Engaging discussion about trends and analysis]
+Post 2: [Comparison between cryptos with market insight]
+Post 3: [Question about market impact and future predictions]"""
+
+        response = client.chat.completions.create(
             model=GROQ_MODEL,
-            max_tokens=500,
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ]
+            max_tokens=1200,
+            messages=[{"role": "user", "content": prompt}]
         )
         
-        # Parse response
-        response_text = chat_completion.choices[0].message.content
+        response_text = response.choices[0].message.content
         posts = parse_posts(response_text)
-        
-        return posts
+        return posts if posts else [{"content": "What are your thoughts on the current market trends?", "platform": "reddit"}]
     
     except Exception as e:
-        print(f"Error generating content: {e}")
-        return []
-
+        print(f"Error: {e}")
+        return [{"content": "Let's discuss the market trends!", "platform": "reddit"}]
 
 def parse_posts(response_text: str) -> List[Dict[str, str]]:
-    """
-    Parse LLM response into structured post data.
-    
-    Args:
-        response_text (str): Raw response from LLM
-        
-    Returns:
-        list: List of posts with content and metadata
-    """
+    """Parse posts from LLM response"""
     posts = []
-    lines = response_text.split("\n")
+    current_post = ""
     
-    for line in lines:
+    for line in response_text.split("\n"):
         if line.strip().startswith("Post"):
-            # Extract content after the colon
-            content = line.split(":", 1)[-1].strip()
-            if content:
-                posts.append({
-                    "content": content,
-                    "platform": "twitter",
-                    "character_count": len(content)
-                })
+            if current_post:
+                posts.append({"content": current_post.strip(), "platform": "reddit"})
+            current_post = ""
+        else:
+            if line.strip():
+                current_post += " " + line.strip()
     
-    return posts if posts else [{"content": "Check out the trending films this week!", "platform": "twitter", "character_count": 0}]
+    if current_post:
+        posts.append({"content": current_post.strip(), "platform": "reddit"})
+    
+    return posts[:3] if posts else [{"content": "What's your take on the market?", "platform": "reddit"}]

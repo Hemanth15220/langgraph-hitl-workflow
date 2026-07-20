@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangGraph Crypto Trends Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💰 Crypto Trends Dashboard</h1>
+            <p>AI-powered cryptocurrency market analysis & insights</p>
+        </header>
+
+        <main>
+            <section class="control-panel">
+                <button id="startBtn" class="btn btn-primary">🔄 Fetch Live Data</button>
+                <input type="text" id="searchInput" placeholder="Search crypto..." class="search-input">
+                <span id="status" class="status"></span>
+            </section>
+
+            <div class="workflow-container">
+                <!-- Crypto Selection -->
+                <section class="workflow-section">
+                    <h2>📊 Top Cryptocurrencies</h2>
+                    <div id="cryptoGrid" class="crypto-grid">
+                        <p class="placeholder">Click "Fetch Live Data" to load cryptos...</p>
+                    </div>
+                </section>
+
+                <!-- Crypto Details -->
+                <section class="workflow-section" id="detailsSection" style="display: none;">
+                    <h2>📈 Crypto Analysis</h2>
+                    <div id="detailsContainer" class="details-container"></div>
+                </section>
+
+                <!-- Generated Posts -->
+                <section class="workflow-section">
+                    <h2>✍️ AI-Generated Posts</h2>
+                    <div id="contentContainer" class="content-box">
+                        <p class="placeholder">Generate posts for a selected crypto...</p>
+                    </div>
+                </section>
+
+                <!-- Approval -->
+                <section class="workflow-section">
+                    <h2>✅ Review & Publish</h2>
+                    <div id="approvalContainer" class="content-box">
+                        <p class="placeholder">Waiting for content...</p>
+                    </div>
+                    <div id="actionButtons" class="action-buttons" style="display: none;">
+                        <button class="btn btn-success" onclick="approvePost()">✓ Publish</button>
+                        <button class="btn btn-warning" onclick="rejectPost()">✗ Skip</button>
+                    </div>
+                </section>
+
+                <!-- Publication -->
+                <section class="workflow-section">
+                    <h2>📤 Published</h2>
+                    <div id="publicationContainer" class="content-box">
+                        <p class="placeholder">Waiting for approval...</p>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <footer>
+            <p>Powered by LangGraph | Data: CoinGecko | LLM: Groq</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

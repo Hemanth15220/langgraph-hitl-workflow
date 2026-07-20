@@ -1,5 +1,5 @@
 """
-Poster Node: Simulates posting approved content to Reddit
+Poster Node: Simulates posting approved content to Reddit (r/CryptoTrends)
 """
 
 from typing import Dict, Any
@@ -38,7 +38,7 @@ def publish_content(approved_content: Dict[str, Any]) -> Dict[str, Any]:
         return {
             "success": True,
             "post_id": post_id,
-            "subreddit": "r/FilmTrendBot",
+            "subreddit": "r/CryptoTrends",
             "content": post_text,
             "status": "published",
             "timestamp": timestamp,

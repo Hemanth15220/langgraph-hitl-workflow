@@ -1,36 +1,51 @@
-# LangGraph HITL Workflow
+# 💰 LangGraph Crypto Trends Dashboard
 
-Production-grade LangGraph workflow demonstrating stateful content generation with human-in-the-loop control and interrupt-based governance.
+An **AI-powered cryptocurrency market analysis platform** that autonomously researches trending cryptocurrencies, generates engaging Reddit discussions, and publishes insights—all with human-in-the-loop governance.
 
-## Project Overview
+## 🚀 Features
 
-An **autonomous content agent** that:
-1. **Researches** global film trends from TMDB
-2. **Generates** engaging social media posts using Groq LLM
-3. **Pauses** for human review/approval using LangGraph's interrupt() primitive
-4. **Publishes** approved content to Twitter/X
-5. **Observes** the entire workflow via LangSmith
+- **Live Crypto Data**: Real-time cryptocurrency prices and market data from CoinGecko
+- **Interactive Dashboard**: Browse top 100+ cryptocurrencies with search and filtering
+- **Detailed Analytics**: Market cap, volume, price changes, ATH/ATL data
+- **AI-Generated Posts**: Groq LLM generates engaging, informative Reddit-style posts
+- **Human Review**: Approve, reject, or select posts before publishing
+- **Auto-Publishing**: Simulate publishing to Reddit with r/CryptoTrends
+- **Responsive Design**: Beautiful UI that works on all devices
 
-**Tech Stack:** LangGraph + Groq + TMDB + Twitter API (all free tier, open-source)
+## 🏗️ Architecture
 
----
+### Workflow Nodes
+1. **Trend-Spotter** - Fetches live crypto data from CoinGecko API
+2. **Content Creator** - Generates engaging posts using Groq LLM
+3. **HITL Node** - Human review and approval interface
+4. **Poster** - Publishes to simulated Reddit (r/CryptoTrends)
 
-## Setup Status ✅
+### Tech Stack
+- **Backend**: Flask + Python
+- **Frontend**: HTML/CSS/JavaScript
+- **LLM**: Groq (mixtral-8x7b-32768)
+- **Data**: CoinGecko API (free)
+- **Orchestration**: LangGraph (state machine)
 
-### Completed Tasks
-- ✅ Project structure created
-- ✅ Python virtual environment set up
-- ✅ All dependencies installed
-- ✅ API keys configured (TMDB, Groq, Twitter/X, LangSmith)
-- ✅ Git repository initialized and committed
+## 📋 Setup
 
-### Current Environment
-- **Platform:** GitHub Codespaces
-- **Python:** 3.x (venv activated)
-- **LLM:** Groq (mixtral-8x7b-32768)
-- **Dependencies:** See requirements.txt
+### Local Development
+```bash
+# Clone repo
+git clone <repo-url>
+cd langgraph-hitl-workflow
 
----
+# Setup Python environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-## Project Structure
+# Install dependencies
+pip install -r requirements.txt
 
+# Create .env file
+cp .env.example .env
+
+# Add your API keys
+# - GROQ_API_KEY (get from https://console.groq.com)
+# - TMDB_API_KEY (optional, from https://www.themoviedb.org)
+# - TWITTER_BEARER_TOKEN (optional)
