@@ -12,9 +12,10 @@ TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 
 # Groq API
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-GROQ_MODEL = os.getenv("GROQ_MODEL", "mixtral-8x7b-32768")
+GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
 
 # Twitter/X API
+TWITTER_BEARER_TOKEN = os.getenv("TWITTER_BEARER_TOKEN")
 TWITTER_API_KEY = os.getenv("TWITTER_API_KEY")
 TWITTER_API_SECRET = os.getenv("TWITTER_API_SECRET")
 TWITTER_ACCESS_TOKEN = os.getenv("TWITTER_ACCESS_TOKEN")
