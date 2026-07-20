@@ -28,21 +28,21 @@ def generate_content(trends: Dict[str, Any]) -> List[Dict[str, str]]:
         # Create a prompt for the LLM
         film_list = "\n".join([f"- {f['title']} (Rating: {f['rating']}/10)" for f in films[:3]])
         
-        prompt = f"""You are a creative social media manager specializing in film entertainment content.
+        prompt = f"""You're a casual Redditor who loves movies and wants to start discussions about trending films.
 
 Based on these trending films right now:
 {film_list}
 
-Generate 3 short, engaging Twitter-style posts (max 280 characters each) that:
-1. Are catchy and appeal to film enthusiasts worldwide
-2. Use emojis appropriately (1-2 per post)
-3. Create curiosity or excitement about cinema
-4. Are natural and conversational
+Write 3 casual Reddit post titles/content (like you're sharing with friends on r/FilmTrendBot):
+- Keep it conversational and natural
+- Use Reddit style (e.g., "Just watched...", "Has anyone seen...", "TIL...", etc.)
+- Add emojis naturally (not forced)
+- Make people want to discuss/comment
 
 Format your response as:
-Post 1: [content]
-Post 2: [content]
-Post 3: [content]
+Post 1: [casual title/content]
+Post 2: [casual title/content]
+Post 3: [casual title/content]
 """
         
         # Call Groq API using chat.completions

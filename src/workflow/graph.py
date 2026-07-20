@@ -2,8 +2,8 @@
 Workflow Graph: Orchestrates the content generation pipeline using LangGraph
 """
 
-from langgraph.graph import StateGraph
-from typing import TypedDict
+from langgraph.graph import StateGraph, END
+from typing import TypedDict, Optional
 from ..agents.trend_spotter import get_global_trends
 from ..agents.content_creator import generate_content
 from ..agents.hitl_node import human_review
@@ -11,24 +11,10 @@ from ..agents.poster import publish_content
 
 class ContentState(TypedDict):
     """Shared state across all workflow nodes"""
-    # From Trend-Spotter
     trends: Optional[dict]
-    
-    # From Content-Creator
     generated_content: Optional[list]
-    
-    # From HITL
     approved_content: Optional[dict]
-    
-    # From Poster
     publication_result: Optional[dict]
-
-class ContentState(TypedDict):
-    """State shared across all nodes in the workflow"""
-    trends: dict
-    generated_content: dict
-    approved_content: dict
-    publication_result: dict
 
 def trend_spotter_node(state: ContentState) -> ContentState:
     """Wrapper for Trend-Spotter node"""
@@ -83,6 +69,3 @@ def build_graph():
     
     # Compile the graph
     return graph.compile()
-
-
-
