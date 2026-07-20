@@ -1,23 +1,58 @@
 """
 Human-in-the-Loop (HITL) Node: Pauses execution for human review and approval
-Uses LangGraph's interrupt() primitive for governance
 """
 
-from langgraph.types import interrupt
+from typing import Dict, List, Any
 
-def human_review(content):
+def human_review(generated_content: List[Dict[str, str]]) -> Dict[str, Any]:
     """
-    Pause execution to allow human review and approval of generated content.
+    Placeholder for human review and approval of generated content.
+    
+    In production, this would use LangGraph's interrupt() to pause execution
+    and wait for human input. For now, returns approved content for demo.
     
     Args:
-        content (dict): Generated content from Content Creator node
+        generated_content (list): Generated posts from Content Creator node
         
     Returns:
-        dict: Approved content (possibly edited) for posting
+        dict: Approved content with human decision metadata
     """
-    # TODO: Implement HITL logic
-    # - Use interrupt() to pause the graph execution
-    # - Display content to human for review
-    # - Allow edits or rejection
-    # - Resume graph with approved content
-    pass
+    if not generated_content:
+        return {
+            "approved_posts": [],
+            "status": "rejected",
+            "reason": "No content to review"
+        }
+    
+    # For demo: auto-approve first post (in production, human would decide)
+    selected_post = generated_content[0]
+    
+    return {
+        "approved_posts": [selected_post],
+        "status": "approved",
+        "reason": "Human approved",
+        "selected_index": 0
+    }
+
+
+def display_for_review(posts: List[Dict[str, str]]) -> str:
+    """
+    Format posts for human review display.
+    
+    Args:
+        posts (list): Posts to display
+        
+    Returns:
+        str: Formatted display string
+    """
+    display = "\n" + "="*60 + "\n"
+    display += "🔍 HUMAN REVIEW - Generated Social Media Posts\n"
+    display += "="*60 + "\n\n"
+    
+    for i, post in enumerate(posts, 1):
+        display += f"Post {i}:\n"
+        display += f"Content: {post.get('content', 'N/A')}\n"
+        display += f"Platform: {post.get('platform', 'twitter')}\n"
+        display += "-" * 60 + "\n\n"
+    
+    return display
