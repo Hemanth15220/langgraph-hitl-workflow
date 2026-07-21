@@ -21,3 +21,4 @@ ollama==0.1.0
 
 # Optional: Observability
 langsmith==0.1.48
+gunicorn==21.2.0
