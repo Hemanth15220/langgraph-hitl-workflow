@@ -3,71 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LangGraph Crypto Trends Dashboard</title>
+    <title>Crypto Research Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>💰 Crypto Trends Dashboard</h1>
-            <p>AI-powered cryptocurrency market analysis & insights</p>
-        </header>
+    <div class="header">
+        <h1>📊 Crypto Research Dashboard</h1>
+        <button class="btn btn-primary" id="startBtn">🔄 Load Cryptos</button>
+        <div class="status" id="status">Ready</div>
+    </div>
 
-        <main>
-            <section class="control-panel">
-                <button id="startBtn" class="btn btn-primary">🔄 Fetch Live Data</button>
-                <input type="text" id="searchInput" placeholder="Search crypto..." class="search-input">
-                <span id="status" class="status"></span>
-            </section>
-
-            <div class="workflow-container">
-                <!-- Crypto Selection -->
-                <section class="workflow-section">
-                    <h2>📊 Top Cryptocurrencies</h2>
-                    <div id="cryptoGrid" class="crypto-grid">
-                        <p class="placeholder">Click "Fetch Live Data" to load cryptos...</p>
-                    </div>
-                </section>
-
-                <!-- Crypto Details -->
-                <section class="workflow-section" id="detailsSection" style="display: none;">
-                    <h2>📈 Crypto Analysis</h2>
-                    <div id="detailsContainer" class="details-container"></div>
-                </section>
-
-                <!-- Generated Posts -->
-                <section class="workflow-section">
-                    <h2>✍️ AI-Generated Posts</h2>
-                    <div id="contentContainer" class="content-box">
-                        <p class="placeholder">Generate posts for a selected crypto...</p>
-                    </div>
-                </section>
-
-                <!-- Approval -->
-                <section class="workflow-section">
-                    <h2>✅ Review & Publish</h2>
-                    <div id="approvalContainer" class="content-box">
-                        <p class="placeholder">Waiting for content...</p>
-                    </div>
-                    <div id="actionButtons" class="action-buttons" style="display: none;">
-                        <button class="btn btn-success" onclick="approvePost()">✓ Publish</button>
-                        <button class="btn btn-warning" onclick="rejectPost()">✗ Skip</button>
-                    </div>
-                </section>
-
-                <!-- Publication -->
-                <section class="workflow-section">
-                    <h2>📤 Published</h2>
-                    <div id="publicationContainer" class="content-box">
-                        <p class="placeholder">Waiting for approval...</p>
-                    </div>
-                </section>
+    <div class="body-container">
+        <!-- Left Sidebar -->
+        <div class="left-section">
+            <input type="text" id="searchInput" class="search-bar" placeholder="Search cryptos...">
+            <div class="watchlist-header">
+                <span>📌 Watchlist</span>
+                <span class="watchlist-count" id="watchlistCount">0</span>
             </div>
-        </main>
+            <div class="crypto-list" id="cryptoList">
+                <p class="empty-state">Click "Load Cryptos" to begin</p>
+            </div>
+        </div>
 
-        <footer>
-            <p>Powered by LangGraph | Data: CoinGecko | LLM: Groq</p>
-        </footer>
+        <!-- Right Content Area -->
+        <div class="right-section">
+            <!-- Crypto Header -->
+            <div id="cryptoHeader" class="crypto-header" style="display:none;">
+                <img id="cryptoImage" src="" alt="" class="crypto-image">
+                <div class="crypto-header-info">
+                    <h2 id="cryptoName"></h2>
+                    <div class="crypto-meta">
+                        <span id="cryptoSymbol"></span>
+                        <span id="cryptoPrice" class="price"></span>
+                        <span id="cryptoChange" class="change"></span>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" id="watchlistBtn" onclick="toggleWatchlist()">⭐ Add to Watchlist</button>
+            </div>
+
+            <!-- Best Trades Card -->
+            <div id="bestTradesCard" class="card best-trades-card" style="display:none;">
+                <h3>💰 Best Buy/Sell Opportunities</h3>
+                <p style="color: #718096; font-size: 0.9em; margin-bottom: 15px;">AI-powered trading recommendations</p>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <!-- Best Buys -->
+                    <div style="background: #f0fff4; padding: 15px; border-radius: 8px; border-left: 4px solid #48bb78;">
+                        <h4 style="color: #22543d; margin-bottom: 12px;">🟢 Best to BUY</h4>
+                        <div id="bestBuysContent"></div>
+                    </div>
+                    
+                    <!-- Best Sells -->
+                    <div style="background: #fff5f5; padding: 15px; border-radius: 8px; border-left: 4px solid #f56565;">
+                        <h4 style="color: #742a2a; margin-bottom: 12px;">🔴 Best to SELL/CAUTION</h4>
+                        <div id="bestSellsContent"></div>
+                    </div>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 12px; margin-top: 15px; border-radius: 6px; border-left: 4px solid #667eea;">
+                    <p style="font-size: 0.9em; color: #2d3748;"><strong>📈 Market Outlook:</strong> <span id="marketOutlook" style="color: #718096;"></span></p>
+                </div>
+            </div>
+
+            <!-- Risk Analysis Card -->
+            <div id="riskCard" class="card analysis-card" style="display:none;">
+                <div class="card-header">
+                    <h3>⚠️ Risk Analysis</h3>
+                    <div class="score-badge" id="riskScore"></div>
+                </div>
+                <div id="riskContent" class="card-content"></div>
+            </div>
+
+            <!-- Opportunity Card -->
+            <div id="opportunityCard" class="card analysis-card" style="display:none;">
+                <div class="card-header">
+                    <h3>🎯 Opportunity Analysis</h3>
+                    <div class="score-badge" id="opportunityScore"></div>
+                </div>
+                <div id="opportunityContent" class="card-content"></div>
+            </div>
+
+            <!-- Research Synthesis Card -->
+            <div id="synthesisCard" class="card analysis-card" style="display:none;">
+                <div class="card-header">
+                    <h3>📋 Research Summary</h3>
+                </div>
+                <div id="synthesisContent" class="card-content"></div>
+            </div>
+
+            <!-- Details Card -->
+            <div id="detailsCard" class="card" style="display:none;">
+                <h3>📈 Market Details</h3>
+                <div id="detailsContent" class="card-content"></div>
+            </div>
+
+            <!-- Comparison Section -->
+            <div id="comparisonSection" class="card comparison-card" style="display:none;">
+                <h3>⚖️ Compare Cryptos</h3>
+                <p style="color: #718096; font-size: 0.9em; margin-bottom: 15px;">Add multiple cryptos to compare side-by-side</p>
+                
+                <div class="comparison-controls">
+                    <input type="text" id="compareInput" placeholder="Enter symbol: BTC, ETH, SOL...">
+                    <button class="btn btn-small" onclick="addToComparison()">➕ Add</button>
+                    <button class="btn btn-small btn-danger" onclick="clearComparison()">Clear</button>
+                </div>
+                
+                <div id="comparisonContent" style="margin-top: 20px;"></div>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="loadingIndicator" class="loading" style="display:none;">
+                <div class="spinner"></div>
+                <p>Running AI analysis...</p>
+            </div>
+        </div>
     </div>
 
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Trends Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1>💰 Crypto Trends Dashboard</h1>
+        <button id="startBtn" class="btn btn-primary">🔄 Fetch Data</button>
+        <span id="status" class="status"></span>
+    </header>
+
+    <!-- Main Body -->
+    <div class="body-container">
+        <!-- Left Section -->
+        <section class="left-section">
+            <input type="text" id="searchInput" placeholder="🔍 Search crypto..." class="search-bar">
+            <div id="cryptoList" class="crypto-list">
+                <p class="empty-state">Fetching data will populate cryptos here...</p>
+            </div>
+        </section>
+
+        <!-- Right Section -->
+        <section class="right-section">
+            <!-- Details -->
+            <div id="detailsSection" class="card" style="display: none;">
+                <h2>📊 Market Details</h2>
+                <div id="detailsContainer"></div>
+            </div>
+
+            <!-- Posts -->
+            <div id="postsSection" class="card" style="display: none;">
+                <h2>✍️ Bull vs Bear Debate</h2>
+                <div id="contentContainer"></div>
+            </div>
+
+            <!-- Approval -->
+            <div id="approvalSection" class="card" style="display: none;">
+                <h2>📤 Publish</h2>
+                <div id="approvalContainer"></div>
+                <div id="actionButtons" class="action-buttons" style="display: none;">
+                    <button class="btn btn-success" onclick="approvePost()">✓ Publish</button>
+                    <button class="btn btn-warning" onclick="rejectPost()">✗ Skip</button>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div id="resultSection" class="card" style="display: none;">
+                <h2>✅ Published</h2>
+                <div id="publicationContainer"></div>
+            </div>
+        </section>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

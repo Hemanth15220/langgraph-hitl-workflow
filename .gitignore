@@ -12,3 +12,4 @@ venv/
 *.log
 .pytest_cache/
 .coverage
+venv/

@@ -1,0 +1,176 @@
+let currentPostIndex = 0;
+let allCryptos = [];
+let currentPosts = [];
+
+document.addEventListener('DOMContentLoaded', function() {
+    const startBtn = document.getElementById('startBtn');
+    const searchInput = document.getElementById('searchInput');
+    
+    if (startBtn) startBtn.addEventListener('click', startWorkflow);
+    if (searchInput) searchInput.addEventListener('input', filterCryptos);
+});
+
+async function startWorkflow() {
+    const btn = document.getElementById('startBtn');
+    const status = document.getElementById('status');
+    
+    btn.disabled = true;
+    status.textContent = 'Fetching live data...';
+    
+    try {
+        const response = await fetch('/api/start', {method: 'POST', headers: {'Content-Type': 'application/json'}});
+        const data = await response.json();
+        
+        if (data.success && data.trends && data.trends.trending_films) {
+            status.textContent = 'Data loaded! Select a crypto →';
+            displayCryptoList(data.trends.trending_films);
+            allCryptos = data.trends.trending_films;
+        } else {
+            status.textContent = 'Error loading data';
+        }
+    } catch (error) {
+        status.textContent = 'Error: ' + error.message;
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+function displayCryptoList(cryptos) {
+    const container = document.getElementById('cryptoList');
+    if (!container) return;
+    
+    if (!cryptos || cryptos.length === 0) {
+        container.innerHTML = '<p class="empty-state">No cryptos found</p>';
+        return;
+    }
+    
+    let html = '';
+    cryptos.forEach((crypto, index) => {
+        const changeClass = crypto.change_24h >= 0 ? 'positive' : 'negative';
+        const changeSymbol = crypto.change_24h >= 0 ? '📈' : '📉';
+        
+        html += '<div class="crypto-item" onclick="selectCrypto(\'' + crypto.id + '\', ' + index + ')">';
+        html += '<div class="crypto-item-name">' + crypto.title + '</div>';
+        html += '<div class="crypto-item-symbol">' + crypto.symbol + '</div>';
+        html += '<div class="crypto-item-price">$' + (crypto.price || 0).toLocaleString('en-US', {maximumFractionDigits: 2}) + '</div>';
+        html += '<div class="crypto-item-change ' + changeClass + '">' + changeSymbol + ' ' + (crypto.change_24h || 0).toFixed(2) + '%</div>';
+        html += '</div>';
+    });
+    
+    container.innerHTML = html;
+}
+
+function filterCryptos() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const filtered = allCryptos.filter(c => 
+        c.title.toLowerCase().includes(searchTerm) || 
+        c.symbol.toLowerCase().includes(searchTerm)
+    );
+    displayCryptoList(filtered);
+}
+
+async function selectCrypto(cryptoId, index) {
+    const detailsSection = document.getElementById('detailsSection');
+    const detailsContainer = document.getElementById('detailsContainer');
+    
+    if (!detailsContainer) return;
+    
+    try {
+        const response = await fetch('/api/crypto/' + cryptoId);
+        const details = await response.json();
+        
+        let html = '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">';
+        html += '<div><strong>Price:</strong><br/>$' + (details.price || 0).toLocaleString('en-US', {maximumFractionDigits: 2}) + '</div>';
+        html += '<div><strong>Market Cap:</strong><br/>$' + (details.market_cap || 0).toLocaleString('en-US', {notation: 'compact'}) + '</div>';
+        html += '<div><strong>Volume (24h):</strong><br/>$' + (details.volume_24h || 0).toLocaleString('en-US', {notation: 'compact'}) + '</div>';
+        html += '<div><strong>ATH:</strong><br/>$' + (details.ath || 0).toLocaleString('en-US', {maximumFractionDigits: 2}) + '</div>';
+        html += '</div>';
+        
+        detailsContainer.innerHTML = html;
+        if (detailsSection) detailsSection.style.display = 'block';
+        
+        generatePostsForCrypto(allCryptos[index]);
+    } catch (error) {
+        detailsContainer.innerHTML = '<p>Error: ' + error.message + '</p>';
+    }
+}
+
+function generatePostsForCrypto(crypto) {
+    currentPosts = [
+        '📈 BULL CASE for ' + crypto.symbol + '\n\nPrice: $' + (crypto.price || 0).toLocaleString() + '\nMarket Cap: $' + (crypto.market_cap || 0).toLocaleString() + '\n\n✓ Strong adoption\n✓ Technical strength\n✓ Market potential\n\nThis will MOON! 🚀',
+        
+        '📉 BEAR CASE for ' + crypto.symbol + '\n\nPrice: $' + (crypto.price || 0).toLocaleString() + '\n\n⚠ Regulatory risks\n⚠ Market volatility\n⚠ Competition\n\nBE CAREFUL! 🤔',
+        
+        '⚖️ BALANCED VIEW\n\n' + crypto.symbol + ' | $' + (crypto.price || 0).toLocaleString() + '\n24h Change: ' + (crypto.change_24h || 0).toFixed(2) + '%\nMarket Cap: $' + (crypto.market_cap || 0).toLocaleString() + '\n\nWhat are YOUR thoughts? 💭'
+    ];
+    
+    let html = '';
+    currentPosts.forEach((post, i) => {
+        html += '<div class="post-item" onclick="selectPost(' + i + ')"><pre>' + post + '</pre></div>';
+    });
+    
+    const contentContainer = document.getElementById('contentContainer');
+    if (contentContainer) contentContainer.innerHTML = html;
+    
+    const postsSection = document.getElementById('postsSection');
+    if (postsSection) postsSection.style.display = 'block';
+    
+    const approvalSection = document.getElementById('approvalSection');
+    if (approvalSection) approvalSection.style.display = 'block';
+    
+    const resultSection = document.getElementById('resultSection');
+    if (resultSection) resultSection.style.display = 'block';
+    
+    const approvalContainer = document.getElementById('approvalContainer');
+    if (approvalContainer) approvalContainer.innerHTML = '<p>👇 Select a post to publish</p>';
+    
+    const actionButtons = document.getElementById('actionButtons');
+    if (actionButtons) actionButtons.style.display = 'none';
+}
+
+function selectPost(index) {
+    currentPostIndex = index;
+    const items = document.querySelectorAll('.post-item');
+    items.forEach(el => el.classList.remove('selected'));
+    if (items[index]) items[index].classList.add('selected');
+    
+    const actionButtons = document.getElementById('actionButtons');
+    if (actionButtons) actionButtons.style.display = 'flex';
+}
+
+async function approvePost() {
+    const selectedPost = document.querySelector('.post-item.selected');
+    if (!selectedPost) {
+        document.getElementById('status').textContent = 'Select a post first';
+        return;
+    }
+    
+    const postContent = selectedPost.textContent;
+    document.getElementById('status').textContent = 'Publishing...';
+    
+    try {
+        const response = await fetch('/api/approve', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({post_index: currentPostIndex, post_content: postContent})
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            document.getElementById('status').textContent = 'Published! ✅';
+            const pubContainer = document.getElementById('publicationContainer');
+            if (pubContainer) {
+                pubContainer.innerHTML = '<div style="background: #f0fff4; padding: 15px; border-radius: 8px;"><h3 style="color: #48bb78;">✅ Published to r/CryptoTrends!</h3><p><strong>Posted:</strong> ' + new Date().toLocaleString() + '</p></div>';
+            }
+        }
+    } catch (error) {
+        document.getElementById('status').textContent = 'Error: ' + error.message;
+    }
+}
+
+function rejectPost() {
+    document.getElementById('status').textContent = 'Skipped ⏭️';
+    document.querySelectorAll('.post-item').forEach(el => el.classList.remove('selected'));
+    const actionButtons = document.getElementById('actionButtons');
+    if (actionButtons) actionButtons.style.display = 'none';
+}
